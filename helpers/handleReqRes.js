@@ -48,24 +48,11 @@ handler.handleReqRes = (req, res) => {
     headersObject,
     headersObject,
   }
+
   let realData = '';
 
   const choosenHandler = routes[trimmedPath] ? routes[trimmedPath] : notFoundHandler;
 
-  choosenHandler(requestProperties, (statusCode, playload) => {
-
-    statusCode = typeof (statusCode) === 'number' ? statusCode : 500;
-
-    playload = typeof (playload) === 'object' ? playload : {};
-
-    const playloadString = JSON.stringify(playload);
-
-    // return the final response
-
-    res.writeHead(statusCode);
-    res.end(playloadString);
-
-  })
 
 
   req.on('data', (buffer) => {
@@ -74,6 +61,21 @@ handler.handleReqRes = (req, res) => {
 
   req.on('end', () => {
     realData += decoder.end();
+
+    choosenHandler(requestProperties, (statusCode, playload) => {
+
+      statusCode = typeof (statusCode) === 'number' ? statusCode : 500;
+
+      playload = typeof (playload) === 'object' ? playload : {};
+
+      const playloadString = JSON.stringify(playload);
+
+      // return the final response
+
+      res.writeHead(statusCode);
+      res.end(playloadString);
+
+    })
     res.end('Hello Programmers');
   })
 
