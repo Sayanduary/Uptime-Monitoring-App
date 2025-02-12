@@ -23,10 +23,13 @@ const app = {};
 
 //testing file system
 
-data.readDataFromFile('test', 'newFile', (err, data) => {
-  console.log(err, data);
+data.create('test', 'newFile', { Name: 'Sayan Duary', Learning: 'Node JS' }, (err) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log('File created successfully!');
+  }
 });
-
 
 
 // Config--
