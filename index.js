@@ -17,8 +17,17 @@ const { handleReqRes } = require('./helpers/handleReqRes')
 
 const environments = require('./helpers/environment')
 
+const data = require('./lib/data');
 //Module Scaffolding--
 const app = {};
+
+//testing file system
+
+data.readDataFromFile('test', 'newFile', (err, data) => {
+  console.log(err, data);
+});
+
+
 
 // Config--
 

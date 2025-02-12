@@ -1,39 +1,24 @@
 /*
-
- * Title:Handle Request and Responds
- * Description: Handle Request and Responds
- * Authot:Sayan Duary
- * Date:10.02.25
- 
+ * Title: Handle Request and Response
+ * Description: Handles HTTP Requests and sends appropriate responses
+ * Author: Sayan Duary
+ * Date: 10.02.25
  */
 
-
-// dependencies
+// Dependencies
 const { StringDecoder } = require('string_decoder');
-
-const url = require('url'); // request url path
-
-const { buffer, json } = require('stream/consumers');
-
-const routes = require('../routes')
-
+const url = require('url'); // Parse request URL
+const routes = require('../routes');
 const { notFoundHandler } = require('../handlers/routeHandlers/notFoundHandler');
-
-const { type } = require('os');
 
 // Module Scaffolding
 const handler = {};
 
 handler.handleReqRes = (req, res) => {
-
-
-  // request handling
-  // parisng the url 
-
-
+  // Parsing the URL
   const parsedUrl = url.parse(req.url, true);
   const path = parsedUrl.pathname;
-  const trimmedPath = path.replace(/^\/+|\/+$/g, '')
+  const trimmedPath = path.replace(/^\/+|\/+$/g, '');
   const method = req.method.toLowerCase();
   const queryStringObject = parsedUrl.query;
   const headersObject = req.headers;
@@ -46,40 +31,30 @@ handler.handleReqRes = (req, res) => {
     method,
     queryStringObject,
     headersObject,
-    headersObject,
-  }
+  };
 
   let realData = '';
 
-  const choosenHandler = routes[trimmedPath] ? routes[trimmedPath] : notFoundHandler;
-
-
+  const chosenHandler = routes[trimmedPath] ? routes[trimmedPath] : notFoundHandler;
 
   req.on('data', (buffer) => {
     realData += decoder.write(buffer);
-  })
+  });
 
   req.on('end', () => {
     realData += decoder.end();
 
-    choosenHandler(requestProperties, (statusCode, playload) => {
+    chosenHandler(requestProperties, (statusCode, payload) => {
+      statusCode = typeof statusCode === 'number' ? statusCode : 500;
+      payload = typeof payload === 'object' ? payload : {};
 
-      statusCode = typeof (statusCode) === 'number' ? statusCode : 500;
+      const payloadString = JSON.stringify(payload);
 
-      playload = typeof (playload) === 'object' ? playload : {};
-
-      const playloadString = JSON.stringify(playload);
-
-      // return the final response
-
-      res.writeHead(statusCode);
-      res.end(playloadString);
-
-    })
-    res.end('Hello Programmers');
-  })
-
-  // responds handle
-}
+      // Return the final response
+      res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+      res.end(payloadString);
+    });
+  });
+};
 
 module.exports = handler;
